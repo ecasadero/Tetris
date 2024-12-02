@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>1342ea37-1d37-4589-b0b7-274ad219c337</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MyTetris.py</StartupFile>
+    <StartupFile>Main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MyTetris.py" />
+    <Compile Include="configuration.py" />
+    <Compile Include="dqnAgent.py" />
+    <Compile Include="Main.py" />
+    <Compile Include="tetrisEnvironment.py" />
+    <Compile Include="utilities.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
