@@ -1,7 +1,5 @@
-import pygame
-
 import random
-
+import pygame
 import sqlite3
 
 
@@ -330,39 +328,36 @@ def clear_lines(board):
 
     return new_board, lines_cleared
 
-
-
 def draw_side_panel(screen, score, level, next_shape_data, held_shape_data):
-    font = pygame.font.SysFont("Times New Roman", 24)
+        font = pygame.font.SysFont("Times New Roman", 24)
 
-    # Draw Score
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT // 2 - 80))
+        # Draw Score
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        screen.blit(score_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT // 2 - 80))
 
-    # Draw Level
-    level_text = font.render(f"Level: {level}", True, WHITE)
-    screen.blit(level_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT // 2 - 50))
+        # Draw Level
+        level_text = font.render(f"Level: {level}", True, WHITE)
+        screen.blit(level_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT // 2 - 5))
 
-    # Draw Next Shape Preview
-    next_text = font.render("Next:", True, WHITE)
-    screen.blit(next_text, (SCREEN_WIDTH + 10, 30))
-    if next_shape_data:
-        next_shape, next_color = next_shape_data
-        for y, row in enumerate(next_shape):
-            for x, value in enumerate(row):
-                if value:
-                    draw_block(screen, next_color, (x + BOARD_WIDTH + 1, y + 2))
+        # Draw Next Shape Preview
+        next_text = font.render("Next:", True, WHITE)
+        screen.blit(next_text, (SCREEN_WIDTH + 10, 30))
+        if next_shape_data:
+            next_shape, next_color = next_shape_data
+            for y, row in enumerate(next_shape):
+                for x, value in enumerate(row):
+                    if value:
+                        draw_block(screen, next_color, (x + BOARD_WIDTH + 1, y + 2))
 
-    # Draw Held Shape
-    hold_text = font.render("Hold:", True, WHITE)
-    screen.blit(hold_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT - 160))
-    if held_shape_data:
-        held_shape, held_color = held_shape_data
-        for y, row in enumerate(held_shape):
-            for x, value in enumerate(row):
-                if value:
-                    draw_block(screen, held_color, (x + BOARD_WIDTH + 1, y + BOARD_HEIGHT - 5))
-
+        # Draw Held Shape
+        hold_text = font.render("Hold:", True, WHITE)
+        screen.blit(hold_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT - 200))
+        if held_shape_data:
+            held_shape, held_color = held_shape_data
+            for y, row in enumerate(held_shape):
+                for x, value in enumerate(row):
+                    if value:
+                        draw_block(screen, held_color, (x + BOARD_WIDTH + 1, y + BOARD_HEIGHT - 5))
 
 
 def main():
@@ -496,3 +491,12 @@ def main():
         pygame.display.update()
 
     pygame.quit()
+
+
+
+
+
+
+if __name__ == "__main__":
+
+    main()
