@@ -94,13 +94,12 @@ class TetrisEnv:
         self.fall_speed = 500
         self.game_over = False
 
-        self.current_shape_name, (self.current_shape, _) = random.choice(SHAPES_LIST)
-        self.next_shape_name, (self.next_shape, _) = random.choice(SHAPES_LIST)
+        self.current_shape_name, (self.current_shape, self.current_color) = random.choice(SHAPES_LIST)
+        self.next_shape_name, (self.next_shape, self.next_color) = random.choice(SHAPES_LIST)
         self.shape_pos = [BOARD_WIDTH // 2 - len(self.current_shape[0]) // 2, -2]  # Start above the board
-        self.hold_used = False
-        self.held_shape = None
 
         self.last_total_lines_cleared = 0
+        self.piece_locked = False  # Flag to indicate if the piece was locked during apply_action
 
         state = self.get_state()
         return state
@@ -108,20 +107,26 @@ class TetrisEnv:
     def step(self, action):
         reward = 0
         done = False
+        self.piece_locked = False  # Reset the flag at the start of each step
 
         # Apply the action
         self.apply_action(action)
 
-        # Simulate one time step (piece falls by one if possible)
-        self.shape_pos[1] += 1
-        if not valid_position(self.board, self.current_shape, self.shape_pos):
-            self.shape_pos[1] -= 1
-            self.lock_piece()
-            lines_cleared = self.total_lines_cleared - self.last_total_lines_cleared
-            reward += lines_cleared * 10  # Reward for clearing lines
-            self.last_total_lines_cleared = self.total_lines_cleared
+        # If the piece was not locked during apply_action, simulate gravity
+        if not self.piece_locked:
+            self.shape_pos[1] += 1
+            if not valid_position(self.board, self.current_shape, self.shape_pos):
+                self.shape_pos[1] -= 1
+                self.lock_piece()
+                lines_cleared = self.total_lines_cleared - self.last_total_lines_cleared
+                reward += lines_cleared * 10  # Reward for clearing lines
+                self.last_total_lines_cleared = self.total_lines_cleared
+            else:
+                lines_cleared = 0
         else:
-            lines_cleared = 0
+            lines_cleared = self.total_lines_cleared - self.last_total_lines_cleared
+            reward += lines_cleared * 10
+            self.last_total_lines_cleared = self.total_lines_cleared
 
         # Check if game is over
         if self.game_over:
@@ -162,11 +167,13 @@ class TetrisEnv:
             if not valid_position(self.board, self.current_shape, self.shape_pos):
                 self.shape_pos[1] -= 1
                 self.lock_piece()
+                self.piece_locked = True
         elif action == 4:
             # Hard drop
             while valid_position(self.board, self.current_shape, (self.shape_pos[0], self.shape_pos[1] + 1)):
                 self.shape_pos[1] += 1
             self.lock_piece()
+            self.piece_locked = True
 
     def lock_piece(self):
         add_shape_to_board(self.board, self.current_shape, self.shape_pos)
@@ -181,8 +188,12 @@ class TetrisEnv:
             self.fall_speed = max(50, int(self.fall_speed * 0.75))
 
         # Get next shape
-        self.current_shape_name, (self.current_shape, _) = self.next_shape_name, (self.next_shape, _)
-        self.next_shape_name, (self.next_shape, _) = random.choice(SHAPES_LIST)
+        self.current_shape_name = self.next_shape_name
+        self.current_shape = self.next_shape
+        self.current_color = self.next_color
+
+        # Pick a new next shape
+        self.next_shape_name, (self.next_shape, self.next_color) = random.choice(SHAPES_LIST)
         self.shape_pos = [BOARD_WIDTH // 2 - len(self.current_shape[0]) // 2, -2]
 
         if not valid_position(self.board, self.current_shape, self.shape_pos):
@@ -192,8 +203,6 @@ class TetrisEnv:
         # Feature-based state representation
         # Heights of each column
         heights = self.get_column_heights()
-        # Differences between adjacent columns
-        diffs = [heights[i] - heights[i + 1] for i in range(len(heights) - 1)]
         # Number of holes
         holes = self.count_holes()
         # Bumpiness
@@ -235,6 +244,13 @@ class TetrisEnv:
         if not self.render_mode:
             return
         self.screen.fill(BLACK)
+
+        # Handle Pygame events to keep the window responsive
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.close()
+                return
+
         # Draw board
         for y in range(BOARD_HEIGHT):
             for x in range(BOARD_WIDTH):
@@ -255,3 +271,4 @@ class TetrisEnv:
     def close(self):
         if self.render_mode:
             pygame.quit()
+            self.render_mode = False  # Ensure we don't try to render after closing

@@ -1,82 +1,84 @@
 # main.py
 
 import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import random
 import math
-from tetris_env import TetrisEnv
-from dqn_agent import DQN, ReplayMemory, optimize_model
+import numpy as np
+from collections import deque
+from tetrisEnvironment import TetrisEnv
+import config  # Import your config file
+from dqnAgent import DQN, ReplayMemory, select_action, optimize_model
 
-# Hyperparameters and configurations
-BATCH_SIZE = 64
-GAMMA = 0.99
-EPS_START = 1.0
-EPS_END = 0.1
-EPS_DECAY = 1000000
-TARGET_UPDATE = 10
-NUM_EPISODES = 1000  # Set the number of episodes for training
-MEMORY_CAPACITY = 100000
+# Set the device for computations
+device = torch.device(config.DEVICE)
 
 def main():
     # Initialize the environment
-    env = TetrisEnv()
+    env = TetrisEnv(render_mode=config.RENDER_MODE)
     state_size = len(env.get_state())
     action_size = len(env.action_space)
 
     # Initialize the policy and target networks
-    policy_net = DQN(state_size, action_size)
-    target_net = DQN(state_size, action_size)
+    policy_net = DQN(state_size, action_size).to(device)
+    target_net = DQN(state_size, action_size).to(device)
     target_net.load_state_dict(policy_net.state_dict())
     target_net.eval()
 
     # Set up the optimizer and replay memory
-    optimizer = optim.Adam(policy_net.parameters())
-    memory = ReplayMemory(MEMORY_CAPACITY)
+    optimizer = optim.Adam(policy_net.parameters(), lr=config.LEARNING_RATE)
+    memory = ReplayMemory(config.MEMORY_CAPACITY)
 
     steps_done = 0
 
-    for episode in range(NUM_EPISODES):
+    for episode in range(config.NUM_EPISODES):
+        # Reset the environment and get initial state
         state = env.reset()
-        state = torch.tensor([state], dtype=torch.float32)
+        state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(device)
         total_reward = 0
+        done = False
 
-        while True:
+        while not done:
             # Select action using epsilon-greedy policy
-            eps_threshold = EPS_END + (EPS_START - EPS_END) * \
-                math.exp(-1. * steps_done / EPS_DECAY)
+            action = select_action(state, policy_net, steps_done)
             steps_done += 1
-
-            if random.random() < eps_threshold:
-                action = random.randrange(action_size)
-            else:
-                with torch.no_grad():
-                    action = policy_net(state).argmax(dim=1).item()
 
             # Perform action
             next_state, reward, done, _ = env.step(action)
             total_reward += reward
-            reward = torch.tensor([reward], dtype=torch.float32)
 
+            # Convert reward to tensor
+            reward = torch.tensor([reward], dtype=torch.float32).to(device)
+
+            # Convert next_state to tensor if not done
             if not done:
-                next_state = torch.tensor([next_state], dtype=torch.float32)
+                next_state = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0).to(device)
             else:
                 next_state = None
 
             # Store transition in memory
-            memory.push(state, action, next_state, reward)
+            memory.push(state, action, reward, next_state, done)
 
             # Move to the next state
-            state = next_state
+            state = next_state if next_state is not None else torch.zeros_like(state)
 
             # Perform optimization
-            if len(memory) > BATCH_SIZE:
-                optimize_model(policy_net, target_net, memory, optimizer)
+            optimize_model(policy_net, target_net, memory, optimizer)
 
-            if done:
-                print(f"Episode {episode} finished with reward {total_reward}")
-                break
-
-        # Update the target network
-        if episode % TARGET_UPDATE == 0:
+        # Update the target network periodically
+        if episode % config.TARGET_UPDATE == 0:
             target_net.load_state_dict(policy_net.state_dict())
+
+        print(f"Episode {episode} finished with reward {total_reward}")
+
+    # Save the trained model if required
+    if config.SAVE_MODEL:
+        torch.save(policy_net.state_dict(), config.MODEL_SAVE_PATH)
+
+    # Close the environment
+    env.close()
 
 if __name__ == "__main__":
     main()
