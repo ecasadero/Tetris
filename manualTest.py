@@ -1,6 +1,6 @@
 # manual_test.py
 
-from tetrisEnvironment import TetrisEnv  # Import your TetrisEnv class
+from tetrisEnvironment import TetrisEnv  # Import the tetrisEnvironment class
 import pygame
 
 def manual_test():
