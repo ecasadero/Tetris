@@ -9,7 +9,7 @@ import math
 import numpy as np
 from collections import deque
 from tetrisEnvironment import TetrisEnv, start_new_run, end_run, save_episode_reward
-import config  # Import your config file
+import config  # Import config file
 from dqnAgent import DQN, ReplayMemory, select_action, optimize_model
 
 import torch
