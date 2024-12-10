@@ -16,9 +16,9 @@ class DQN(nn.Module):
     def __init__(self, input_size, output_size):
         super(DQN, self).__init__()
         # Define the neural network layers
-        self.fc1 = nn.Linear(input_size, 128)
-        self.fc2 = nn.Linear(128, 128)
-        self.out = nn.Linear(128, output_size)
+        self.fc1 = nn.Linear(input_size, 256)
+        self.fc2 = nn.Linear(256, 256)
+        self.out = nn.Linear(256, output_size)
 
     def forward(self, x):
         # Forward pass through the network
