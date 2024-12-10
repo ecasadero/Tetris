@@ -19,7 +19,7 @@ def manual_test():
         'hold': 0
     }
 
-    # Set key repeat delay and interval (in milliseconds)
+    # Set key repeat delay and interval in milliseconds
     key_repeat_delay = 150  # Initial delay before repeating
     key_repeat_interval = 100  # Interval between repeats
 
