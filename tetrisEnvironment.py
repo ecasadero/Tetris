@@ -9,9 +9,9 @@ import sqlite3
 pygame.init()
 
 # Screen size and block settings
-BLOCK_SIZE = 30
+BLOCK_SIZE = 30 #30 pixels
 BOARD_WIDTH = 10
-BOARD_HEIGHT = 20
+BOARD_HEIGHT = 20 #Width and height are based on blocks, so 10 blocks and 20 blocks respectively
 SCREEN_WIDTH = BOARD_WIDTH * BLOCK_SIZE
 SCREEN_HEIGHT = BOARD_HEIGHT * BLOCK_SIZE
 SIDE_PANEL_WIDTH = 200  # For side panel
@@ -27,6 +27,7 @@ CYAN = (0, 255, 255)
 MAGENTA = (255, 0, 255)
 YELLOW = (255, 255, 0)
 ORANGE = (255, 165, 0)
+CSUGREEN = (40,91,60)
 
 # Defines tetromino shapes with colors
 SHAPES_WITH_COLORS = {
@@ -303,15 +304,15 @@ def draw_side_panel(screen, score, level, next_shape_data, held_shape_data):
     font = pygame.font.SysFont("Times New Roman", 24)
 
     # Draw Score
-    score_text = font.render(f"Score: {score}", True, WHITE)
+    score_text = font.render(f"Score: {score}", True, CSUGREEN)
     screen.blit(score_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT // 2 - 80))
 
     # Draw Level
-    level_text = font.render(f"Level: {level}", True, WHITE)
+    level_text = font.render(f"Level: {level}", True, CSUGREEN)
     screen.blit(level_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT // 2 - 15))
 
     # Draw Next Shape Preview
-    next_text = font.render("Next:", True, WHITE)
+    next_text = font.render("Next:", True, CSUGREEN)
     screen.blit(next_text, (SCREEN_WIDTH + 10, 30))
     if next_shape_data:
         next_shape, next_color = next_shape_data
@@ -321,7 +322,7 @@ def draw_side_panel(screen, score, level, next_shape_data, held_shape_data):
                     draw_block(screen, next_color, (x + BOARD_WIDTH + 1, y + 2))
 
     # Draw Held Shape
-    hold_text = font.render("Hold:", True, WHITE)
+    hold_text = font.render("Hold:", True, CSUGREEN)
     screen.blit(hold_text, (SCREEN_WIDTH + 10, SCREEN_HEIGHT - 195))
     if held_shape_data:
         held_shape, held_color = held_shape_data
@@ -338,6 +339,10 @@ class TetrisEnv:
             self.screen = pygame.display.set_mode((SCREEN_WIDTH + SIDE_PANEL_WIDTH, SCREEN_HEIGHT))
             pygame.display.set_caption('CSU Tetris AI')
             self.clock = pygame.time.Clock()
+
+            self.background_image = pygame.image.load("CSULOGO.png")  # Replace with your image file
+            self.background_image = pygame.transform.scale(self.background_image,(SCREEN_WIDTH , SCREEN_HEIGHT))
+
         else:
             self.screen = None
             self.clock = None
@@ -638,7 +643,8 @@ class TetrisEnv:
     def render(self):
         if not self.render_mode:
             return
-        self.screen.fill(BLACK)
+        self.screen.blit(self.background_image, (0, 0))
+        pygame.draw.rect(self.screen, (153, 255, 204), pygame.Rect(SCREEN_WIDTH, 0, SIDE_PANEL_WIDTH, SCREEN_HEIGHT))
 
         # Handle Pygame events to keep the window responsive
         for event in pygame.event.get():

@@ -74,7 +74,7 @@ def manual_test():
                     key_timers['hard_drop'] = current_time
             if hold:
                 if current_time - key_timers['hold'] > key_repeat_delay:
-                    action = 5  # Hold
+                    action = 5  # Holdgim
                     key_timers['hold'] = current_time
 
         # Apply action if any
