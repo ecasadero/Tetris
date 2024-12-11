@@ -12,13 +12,6 @@ from tetrisEnvironment import TetrisEnv, start_new_run, end_run, save_episode_re
 import config  # Import config file
 from dqnAgent import DQN, ReplayMemory, select_action, optimize_model
 
-import torch
-import torch.optim as optim
-import numpy as np
-from tetrisEnvironment import TetrisEnv, start_new_run, end_run, save_episode_reward
-import config  # Import your config file
-from dqnAgent import DQN, ReplayMemory, select_action, optimize_model
-
 # Set the device for computations
 device = torch.device(config.DEVICE)
 
