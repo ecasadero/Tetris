@@ -1,30 +1,29 @@
-Set Up and Installation.
+***Set Up and Installation***
 
-This Project requires Python, Pytorch and Pygame to run. 
-Regardless of whether you have a 
-NVDIA, AMD GPU or an APU, Python installation is necessary.
+This Project requires Python, Pytorch and Pygame to run. Regardless of whether you have a NVDIA, AMD GPU or an APU, Python installation is
+necessary.
 
-You may download Python here, search for the correct version for you. Ensure you add 
-Python to your PATH's.
+You may download Python here, search for the correct version for you. Ensure you add Python to your PATH's.
 
 https://www.python.org/downloads/
 
-------------------------------Installing Pytorch-------------------------------------
+**************************************************************** **Installing Pytorch** ******************************************************************
 
-For CPU Only and any Non-Nvdia, Non-Highend 7000 Series AMD GPU----------------------
-If you lack an external GPU and only have an APU run this command in terminal
+---------------------------------------For CPU Only and any Non-Nvdia, Non-Highend 7000 Series AMD GPU----------------------------------------
+
+If you lack any compatible GPU's use these instructions
 
 *************************************************************************************
 pip install torch torchvision torchaudio
 *************************************************************************************
 
-For Nvdia----------------------------------------------------------------------------
+-------------------------------------------------------------------------For Nvdia-------------------------------------------------------------------------
 
 *************************************************************************************
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 *************************************************************************************
 
-For AMD Radeon RX 7900 XTX/ XT/ GRE-------------------------------------------------
+----------------------------------------------------------For AMD Radeon RX 7900 XTX/ XT/ GRE-------------------------------------------------------
 
 List of supported AMD GPU's May be found here
 
@@ -41,10 +40,15 @@ Once you have your Linux distribution running, run these commands to install ROC
 within Linux
 *************************************************************************************
 sudo apt update
+
 wget https://repo.radeon.com/amdgpu-install/6.1.3/ubuntu/jammy/amdgpu-install_6.1.60103-1_all.deb
+
 sudo apt install ./amdgpu-install_6.1.60103-1_all.deb
+
 sudo amdgpu-install -y --usecase=graphics,rocm
+
 sudo usermod -a -G render,video $LOGNAME
+
 *************************************************************************************
 
 More Installation Information here:
