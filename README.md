@@ -67,3 +67,22 @@ Run these commands in terminal
 ******************************************************************
 pip install numpy
 ******************************************************************
+
+***Running the Model***
+
+To run the AI model, simply run the Main file. This should create a popup window that automatically plays tetris. You may close this Window, the game will
+continue running in the background. Print statements will appear on console detailing the progress.
+
+***How to manually Play the Game***
+
+To play Tetris run the manualTest file. This should create a popup window, use the *LEFT* and *RIGHT* arrow keys to move the pieces across the board. The *UP*
+key changes the orientation the piece. The *DOWN* key can be used to drop the piece faster. Use the *C* key to hold your current piece, you may not do this consecutively.
+
+***How to modify Settings***
+
+To change hyperparameters, you may use the config file. Most notably the episode count can be adjusted in line 12 "NUM_EPISODES" it is currently set to 20000 which is excessive for simply testing the program. I would suggest changing this to 100, as the first 100 runs, are relatively quick, then they begin taking a considerable amount of time. But feel free to change this as necessary.
+
+***Where will the database and model be saved?***
+
+Those files will be saved within the project folder.
+
