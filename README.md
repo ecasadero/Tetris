@@ -86,3 +86,15 @@ To change hyperparameters, you may use the config file. Most notably the episode
 
 Those files will be saved within the project folder.
 
+***Directory Structure***
+
+Tetris-AI/
+│
+├── Main.py                 # Main script to run the AI
+├── manualTest.py           # Script to play Tetris manually
+├── tetrisEnvironment.py    # Environment and gameplay logic
+├── dqnAgent.py             # Deep Q-Learning agent
+├── config.py               # Configuration and hyperparameter settings
+├── requirements.txt        # Dependencies for the project
+├── saved_models/           # Directory for saved model weights
+└── database/               # Directory for gameplay statistics
