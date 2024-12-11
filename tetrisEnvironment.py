@@ -41,7 +41,7 @@ SHAPES_WITH_COLORS = {
 
 SHAPES_LIST = list(SHAPES_WITH_COLORS.items())
 
-# Initialize the database
+# Initializes the database
 def initialize_database():
     conn = sqlite3.connect('tetris_stats.db')
     c = conn.cursor()
@@ -103,7 +103,7 @@ def update_database_schema():
     conn = sqlite3.connect('tetris_stats.db')
     c = conn.cursor()
 
-    # Add the `pieces_placed` column if it doesn't already exist
+    # Adds the `pieces_placed` column if it doesn't already exist
     try:
         c.execute("ALTER TABLE episode_rewards ADD COLUMN pieces_placed INTEGER DEFAULT 0")
     except sqlite3.OperationalError:
@@ -120,7 +120,7 @@ def start_new_run():
     conn = sqlite3.connect('tetris_stats.db')
     c = conn.cursor()
 
-    # Insert a new run record
+    # Inserts a new run record
     c.execute('INSERT INTO runs DEFAULT VALUES')
     run_id = c.lastrowid  # Get the new run_id
 
@@ -272,7 +272,7 @@ def add_shape_to_board(board, shape, color, offset, shape_type, game_id):
     for y, row in enumerate(shape):
         for x, value in enumerate(row):
             if value and y + off_y >= 0:
-                board[y + off_y][x + off_x] = color  # Store the block's color
+                board[y + off_y][x + off_x] = color  # Stores the block's color
 
     # Record the placement of the tetromino
     record_tetromino(game_id, shape_type)
@@ -373,7 +373,7 @@ class TetrisEnv:
         initialize_game_stats(self.game_id)
 
         state = self.get_state()
-        self.gravity_timer = pygame.time.get_ticks()  # Reset gravity timer
+        self.gravity_timer = pygame.time.get_ticks()  # Resets gravity timer
         return state
 
     def step(self, action):
@@ -477,7 +477,7 @@ class TetrisEnv:
                 self.piece_locked = True
                 # Reset gravity timer to prevent immediate extra drop
                 self.gravity_timer = pygame.time.get_ticks()
-            # Debugging Statement (Optional)
+            # Debugging Statement 
             # print(f"Action: Soft Drop {'Activated' if not previous_soft_drop else 'Continued'}")
         elif action == 4:
             # Hard drop
@@ -487,7 +487,7 @@ class TetrisEnv:
             self.piece_locked = True
             # Reset gravity timer to prevent immediate extra drop
             self.gravity_timer = pygame.time.get_ticks()
-            # Debugging Statement (Optional)
+            # Debugging Statement
             # print("Action: Hard Drop")
         elif action == 5:
             # Hold
@@ -501,7 +501,7 @@ class TetrisEnv:
                         (self.current_shape_name, self.current_shape, self.current_color), self.held_shape
                 self.shape_pos = [BOARD_WIDTH // 2 - len(self.current_shape[0]) // 2, -2]
                 self.hold_used = True
-                # Debugging Statement (Optional)
+                # Debugging Statement
                 # print("Action: Hold")
 
     def _get_next_shape(self):
@@ -659,7 +659,7 @@ class TetrisEnv:
     def close(self):
         if self.render_mode:
             pygame.quit()
-            self.render_mode = False  # Ensure we don't try to render after closing
+            self.render_mode = False  # Don't try to render after closing
 
         # Update the games table
         self.end_game_session()
