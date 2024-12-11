@@ -55,7 +55,7 @@ def manual_test():
         if soft_drop:
             action = 3  # Soft drop
         else:
-            # Check for movement and apply key repeat handling
+            # Check for movement
             if move_left:
                 if current_time - key_timers['left'] > key_repeat_interval:
                     action = 0  # Move left
@@ -81,7 +81,7 @@ def manual_test():
         if action is not None:
             state, reward, done, _ = env.step(action)
         else:
-            # Let the piece fall naturally based on gravity
+            # Let the piece fall naturally based on the gravity
             state, reward, done, _ = env.step(action=None)
 
         env.render()
