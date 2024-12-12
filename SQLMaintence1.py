@@ -21,10 +21,10 @@ aggregated_data = data.groupby('batch')['total_lines'].sum().reset_index()
 aggregated_data.rename(columns={'batch': 'Batches', 'total_lines': 'Lines Cleared'}, inplace=True)
 
 # Plot the bar graph
-plt.figure(figsize=(12, 6), facecolor='#f5f5f5')  # Set figure background here
+plt.figure(figsize=(12, 6), facecolor='#d3d3d3')  # Set figure background here
 
 # Set the plot background color
-plt.gca().set_facecolor('#f5f5f5')
+plt.gca().set_facecolor('#a9a9a9')
 
 # Plot the bars with a soft dark green color
 plt.bar(aggregated_data['Batches'], aggregated_data['Lines Cleared'], color='#006400', width=0.8)
