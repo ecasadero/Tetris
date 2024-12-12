@@ -77,6 +77,8 @@ def main():
         if episode % config.TARGET_UPDATE == 0:
             target_net.load_state_dict(policy_net.state_dict())
 
+        pieces_placed = env.pieces_placed  # Retrieve accurate count
+
         # Save reward for the episode, including pieces placed
         save_episode_reward(run_id, episode, total_reward, pieces_placed)
         print(f"Episode {episode} finished with reward {total_reward}, pieces placed: {pieces_placed}")

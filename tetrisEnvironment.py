@@ -44,7 +44,7 @@ SHAPES_LIST = list(SHAPES_WITH_COLORS.items())
 
 # Initializes the database
 def initialize_database():
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
     # Create the runs table
@@ -72,15 +72,19 @@ def initialize_database():
     # Create the game_stats table
     c.execute('''
         CREATE TABLE IF NOT EXISTS game_stats (
-            game_id INTEGER,
-            piece_type TEXT,
-            occurrences INTEGER,
-            single_lines INTEGER,
-            double_lines INTEGER,
-            triple_lines INTEGER,
-            tetris_lines INTEGER,
-            total_lines INTEGER,
-            PRIMARY KEY (game_id, piece_type),
+            game_id INTEGER PRIMARY KEY,
+            IShape_occurrences INTEGER DEFAULT 0,
+            OShape_occurrences INTEGER DEFAULT 0,
+            TShape_occurrences INTEGER DEFAULT 0,
+            SShape_occurrences INTEGER DEFAULT 0,
+            ZShape_occurrences INTEGER DEFAULT 0,
+            JShape_occurrences INTEGER DEFAULT 0,
+            LShape_occurrences INTEGER DEFAULT 0,
+            single_lines INTEGER DEFAULT 0,
+            double_lines INTEGER DEFAULT 0,
+            triple_lines INTEGER DEFAULT 0,
+            tetris_lines INTEGER DEFAULT 0,
+            total_lines INTEGER DEFAULT 0,
             FOREIGN KEY (game_id) REFERENCES games(game_id)
         )
     ''')
@@ -95,22 +99,32 @@ def initialize_database():
                 FOREIGN KEY (run_id) REFERENCES runs(run_id)
             )
         ''')
+    # Create the step_rewards table
+
+    c.execute('''
+               CREATE TABLE IF NOT EXISTS step_rewards (
+                   run_id INTEGER,
+                   episode INTEGER,
+                   step INTEGER,
+                   reward REAL,
+                   FOREIGN KEY (run_id) REFERENCES runs(run_id)
+               )
+           ''')
     conn.commit()
     conn.close()
 
 
 initialize_database()
 def update_database_schema():
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
     # Adds the `pieces_placed` column if it doesn't already exist
     try:
-        c.execute("ALTER TABLE episode_rewards ADD COLUMN pieces_placed INTEGER DEFAULT 0")
+        c.execute("ALTER TABLE episode_rewards ADD COLUMN total_reward REAL DEFAULT 0")
     except sqlite3.OperationalError:
         # Column already exists
         pass
-
     conn.commit()
     conn.close()
 
@@ -118,7 +132,7 @@ def update_database_schema():
 update_database_schema()
 
 def start_new_run():
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
     # Inserts a new run record
@@ -132,7 +146,7 @@ def start_new_run():
 
 
 def start_new_game(run_id):
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
     # Insert a new game record
@@ -146,7 +160,7 @@ def start_new_game(run_id):
 
 
 def end_run(run_id):
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
     c.execute('''
@@ -159,33 +173,31 @@ def end_run(run_id):
     conn.close()
 
 def initialize_game_stats(game_id):
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
-    tetrominoes = ['IShape', 'OShape', 'TShape', 'SShape', 'ZShape', 'JShape', 'LShape']
-    for piece in tetrominoes:
-        c.execute('''
-            INSERT OR IGNORE INTO game_stats (
-                game_id, piece_type, occurrences, single_lines, double_lines, triple_lines, tetris_lines, total_lines
-            ) VALUES (?, ?, 0, 0, 0, 0, 0, 0)
-        ''', (game_id, piece))
+    c.execute('''
+            INSERT INTO game_stats (game_id)
+            VALUES (?)
+        ''', (game_id,))
 
     conn.commit()
     conn.close()
 
 def record_tetromino(game_id, piece_type):
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
-    c.execute('''
-        UPDATE game_stats
-        SET occurrences = occurrences + 1
-        WHERE game_id = ? AND piece_type = ?
-    ''', (game_id, piece_type))
+    column_name = f"{piece_type}_occurrences"  # Dynamically determine column name
+    c.execute(f'''
+            UPDATE game_stats
+            SET {column_name} = {column_name} + 1
+            WHERE game_id = ?
+        ''', (game_id,))
     conn.commit()
     conn.close()
 
 def save_episode_reward(run_id, episode, total_reward, pieces_placed):
-        conn = sqlite3.connect('tetris_stats.db')
+        conn = sqlite3.connect('tetris_stats4220.db')
         c = conn.cursor()
 
         c.execute('''
@@ -198,29 +210,20 @@ def save_episode_reward(run_id, episode, total_reward, pieces_placed):
 
 
 def record_line_clears(game_id, lines_cleared, piece_type):
-    conn = sqlite3.connect('tetris_stats.db')
+    conn = sqlite3.connect('tetris_stats4220.db')
     c = conn.cursor()
 
-    # Update total lines cleared
-    c.execute('''
-        UPDATE game_stats
-        SET total_lines = total_lines + ?
-        WHERE game_id = ? AND piece_type = ?
-    ''', (lines_cleared, game_id, piece_type))
-
-    # Update specific line clear counts
     if lines_cleared == 1:
-        c.execute('UPDATE game_stats SET single_lines = single_lines + 1 WHERE game_id = ? AND piece_type = ?',
-                  (game_id, piece_type))
+        c.execute('UPDATE game_stats SET single_lines = single_lines + 1 WHERE game_id = ?', (game_id,))
     elif lines_cleared == 2:
-        c.execute('UPDATE game_stats SET double_lines = double_lines + 1 WHERE game_id = ? AND piece_type = ?',
-                  (game_id, piece_type))
+        c.execute('UPDATE game_stats SET double_lines = double_lines + 1 WHERE game_id = ?', (game_id,))
     elif lines_cleared == 3:
-        c.execute('UPDATE game_stats SET triple_lines = triple_lines + 1 WHERE game_id = ? AND piece_type = ?',
-                  (game_id, piece_type))
+        c.execute('UPDATE game_stats SET triple_lines = triple_lines + 1 WHERE game_id = ?', (game_id,))
     elif lines_cleared == 4:
-        c.execute('UPDATE game_stats SET tetris_lines = tetris_lines + 1 WHERE game_id = ? AND piece_type = ?',
-                  (game_id, piece_type))
+        c.execute('UPDATE game_stats SET tetris_lines = tetris_lines + 1 WHERE game_id = ?', (game_id,))
+
+    # Update total lines cleared
+    c.execute('UPDATE game_stats SET total_lines = total_lines + ? WHERE game_id = ?', (lines_cleared, game_id))
 
     conn.commit()
     conn.close()
@@ -363,6 +366,7 @@ class TetrisEnv:
         self.highest_level = 0
         self.fall_speed = 500
         self.game_over = False
+        self.pieces_placed = 0
 
         self.current_shape_name, (self.current_shape, self.current_color) = random.choice(SHAPES_LIST)
         self.next_shape_name, (self.next_shape, self.next_color) = random.choice(SHAPES_LIST)
@@ -531,6 +535,11 @@ class TetrisEnv:
         self.total_lines_cleared += lines_cleared
         self.score += lines_cleared * 100
 
+        # Increment pieces placed
+        if not hasattr(self, "pieces_placed"):
+            self.pieces_placed = 0  # Initialize if it doesn't exist
+        self.pieces_placed += 1
+
         # Record line clears
         if lines_cleared > 0:
             record_line_clears(self.game_id, lines_cleared, self.current_shape_name)
@@ -671,7 +680,7 @@ class TetrisEnv:
         self.end_game_session()
 
     def end_game_session(self):
-        conn = sqlite3.connect('tetris_stats.db')
+        conn = sqlite3.connect('tetris_stats4220.db')
         c = conn.cursor()
         c.execute('''
             UPDATE games
